@@ -72,42 +72,26 @@ end
 
 local PROF_ROLES = { main = true, alt = true, profession = true }
 
--- Vanilla raid lockouts reset on different cycles (Onyxia 5 days, Zul'Gurub and AQ20 3 days,
--- the rest weekly). The planner works in weeks, so each is treated as one run per week.
+-- Forever raids (Blizzard's raid overview, 20 Oct 2026; open 9 Dec 2026). All three are level 60 and
+-- currently planned to reset weekly, so one run per week fits the planner. Source: ForeverDB.net.
 ns.PRESETS = {
 	-------------------------------------------------------------------------
 	-- Raids (manual checkoff)
 	-------------------------------------------------------------------------
 	{
-		id = "raid_molten_core", name = "Molten Core", category = "Raids",
+		id = "raid_barrow_deeps", name = "The Barrow Deeps (10-player, 8 bosses)", category = "Raids",
 		minutes = 120, value = 100, minLevel = 60, scope = "char",
+		note = "Mount Hyjal. Opens December 9.",
 	},
 	{
-		id = "raid_blackwing_lair", name = "Blackwing Lair", category = "Raids",
-		minutes = 120, value = 100, minLevel = 60, scope = "char",
+		id = "raid_hyjal_summit", name = "Hyjal Summit (20-player, 13 bosses)", category = "Raids",
+		minutes = 180, value = 110, minLevel = 60, scope = "char",
+		note = "Mount Hyjal. Opens December 9.",
 	},
 	{
-		id = "raid_onyxia", name = "Onyxia's Lair", category = "Raids",
-		minutes = 30, value = 60, minLevel = 60, scope = "char",
-		note = "5-day lockout",
-	},
-	{
-		id = "raid_zul_gurub", name = "Zul'Gurub", category = "Raids",
-		minutes = 75, value = 60, minLevel = 60, scope = "char",
-		note = "3-day lockout",
-	},
-	{
-		id = "raid_aq20", name = "Ruins of Ahn'Qiraj (AQ20)", category = "Raids",
-		minutes = 60, value = 60, minLevel = 60, scope = "char",
-		note = "3-day lockout",
-	},
-	{
-		id = "raid_aq40", name = "Temple of Ahn'Qiraj (AQ40)", category = "Raids",
-		minutes = 150, value = 100, minLevel = 60, scope = "char",
-	},
-	{
-		id = "raid_naxxramas", name = "Naxxramas", category = "Raids",
-		minutes = 180, value = 100, minLevel = 60, scope = "char",
+		id = "raid_onyxia", name = "Onyxia's Lair (40-player)", category = "Raids",
+		minutes = 45, value = 70, minLevel = 60, scope = "char",
+		note = "Needs the Drakefire Amulet attunement. Opens December 9.",
 	},
 
 	-------------------------------------------------------------------------

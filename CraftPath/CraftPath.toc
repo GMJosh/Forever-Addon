@@ -1,0 +1,16 @@
+## Interface: 16001
+## Title: CraftPath
+## Notes: Profession leveling planner: the cheapest next craft for a skill-up, with a shopping list. Uses Auctionator prices when installed.
+## Author: Josh
+## Version: 0.1.0
+## Category: Professions
+## SavedVariables: CraftPathDB
+## OptionalDeps: Auctionator
+## IconTexture: Interface\Icons\INV_Misc_Note_01
+
+Config.lua
+Debug.lua
+Core.lua
+Scan.lua
+Planner.lua
+UI\Window.lua
