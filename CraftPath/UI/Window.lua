@@ -206,7 +206,9 @@ local function Build()
 			self:SetText("https://foreverdb.net")
 		end
 	end)
-	link:SetScript("OnEditFocusGained", link.HighlightText)
+	link:SetScript("OnEditFocusGained", function(self)
+		self:HighlightText()
+	end)
 	link:SetScript("OnEscapePressed", link.ClearFocus)
 	frame.creditLink = link
 
