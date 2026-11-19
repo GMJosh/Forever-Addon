@@ -1,0 +1,15 @@
+## Interface: 16001
+## Title: StreamMoments
+## Notes: On-screen alerts and a log for level-ups, rare drops, boss kills and other big moments. Made for streaming, works with OBS.
+## Author: Josh
+## Version: 0.1.0
+## Category: Miscellaneous
+## SavedVariables: StreamMomentsDB
+## IconTexture: Interface\Icons\INV_Misc_Bell_01
+
+Config.lua
+Debug.lua
+Core.lua
+Alerts.lua
+Moments.lua
+UI\Log.lua

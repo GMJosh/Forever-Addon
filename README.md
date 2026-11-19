@@ -9,6 +9,7 @@ Addons for the World of Warcraft **Forever** (Classic) client, Interface `16001`
 | **LevelPace** | Leveling tracker: where your time goes (travel, idle, town, fighting), time to level, XP per hour, kills to level, best zones, and an Advisor tab with quests and dungeons for your level. | `/lp` |
 | **CraftPath** | Profession leveling planner: cheapest next craft, or a full path to the cap, with a shopping list that says where to buy or gather each item. Uses Auctionator prices and ForeverDB data. | `/cpath` |
 | **SessionJournal** | Session logbook: runtime, zones, loot, deaths, gold, with recaps. | `/sj` |
+| **StreamMoments** | On-screen alerts and a log for level-ups, rare drops, boss kills, deaths, profession ranks, rare kills and new zones. Works with OBS. | `/sm` |
 | **StreamBingo** | Detects in-game moments for a Twitch bingo companion app. See `docs/BRIDGE_PROTOCOL.md`. | `/bingo` |
 
 ## Install

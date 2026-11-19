@@ -12,6 +12,7 @@ How to use each addon in this repo. All of them are for the Forever client (Inte
 | [AltTimeBudget](#alttimebudget) | `/atb` | Weekly chore plan across your alts |
 | [ReturnFromBreak](#returnfrombreak) | `/rfb` | "What was I doing?" after time away |
 | [SessionJournal](#sessionjournal) | `/sj` | Diary of every play session |
+| [StreamMoments](#streammoments) | `/sm` | Streamer tool: on-screen alerts and a log of big moments |
 | [StreamBingo](#streambingo) | `/bingo` | Streamer tool: detects moments for a Twitch bingo app |
 
 ---
@@ -141,6 +142,31 @@ Writes a diary entry for every play session, from login to logout.
 **Using the logbook:** pick a session to read it, and copy a recap to share or keep. Choose a default recap format in settings.
 
 **Settings:** how many sessions to keep, minimum session length (short ones are skipped), loot quality shown in recaps, loot cap, quest tracking, and whether to request `/played` at session start. **Delete all sessions** wipes the journal.
+
+---
+
+## StreamMoments
+
+For streamers. Pops up a banner (and a sound) when something big happens, and keeps a log of every moment.
+
+**Commands**
+
+| Command | What it does |
+|---|---|
+| `/sm` | Open the window: turn moments on or off, banner settings, and the log |
+| `/sm test` | Show a sample banner for every moment (`/sm test loot` for just one) |
+| `/sm lock` | Unlock the banner to drag it, then lock it again (locked = click-through) |
+| `/sm bg green` | Banner background: `dark`, `clear`, `green` or `magenta` |
+| `/sm scale 1.2` | Banner size (0.5 to 3) |
+| `/sm time 5` | Seconds each banner stays (2 to 30) |
+| `/sm clear` | Empty the log |
+| `/smdebug` | Debug window |
+
+**Moments it catches:** level-ups (with the time since your last level), your own rare, epic and legendary drops (pick the minimum quality in the window), boss kills (with the fight time), deaths (with a session count), profession ranks (every 75 skill points), rare mob kills and new zones discovered. Each can be turned off. When several happen at once the banners queue up, and every moment is still saved in the log.
+
+**Using it with OBS:** the banner is a normal in-game frame, so your Game Capture shows it with no setup. To put the banner somewhere else on your stream, set `/sm bg green`, add your game capture a second time, crop it to the banner, and add a Chroma Key filter set to green. Use `magenta` if green clashes with the game.
+
+**Good to know:** boss kills rely on the game's encounter events. Check `/smdebug` after a boss to see which signal fired. Moments from other people in your group (their loot, their deaths) are not shown. The log keeps the last 500 moments. It works alongside StreamBingo and doesn't change it.
 
 ---
 
