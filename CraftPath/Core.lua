@@ -84,6 +84,28 @@ function ns.Char()
 	return char
 end
 
+-- Puts a map pin on a spot (coords are percent, like 41.6, 65.8). Falls back to printing the spot.
+function ns.Waypoint(mapID, x, y)
+	if C_Map and C_Map.CanSetUserWaypointOnMap and C_Map.SetUserWaypoint and UiMapPoint and UiMapPoint.CreateFromCoordinates
+		and C_Map.CanSetUserWaypointOnMap(mapID) then
+		C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(mapID, x / 100, y / 100))
+		if C_SuperTrack and C_SuperTrack.SetSuperTrackedUserWaypoint then
+			C_SuperTrack.SetSuperTrackedUserWaypoint(true)
+		end
+		ns.Print(format("Waypoint set at %.1f, %.1f.", x, y))
+	else
+		ns.Print(format("Could not set a waypoint here. The spot is %.1f, %.1f on map %d.", x, y, mapID))
+	end
+end
+
+-- Clicks on |Hcraftpath:way:map:x:y|h links in the window.
+function ns.HandleLink(link)
+	local mapID, x, y = tostring(link):match("^craftpath:way:(%d+):([%d.]+):([%d.]+)$")
+	if mapID then
+		ns.Waypoint(tonumber(mapID), tonumber(x), tonumber(y))
+	end
+end
+
 ---------------------------------------------------------------------------
 -- Events: ns.On("EVENT", fn). Events that do not exist in this client are skipped.
 ---------------------------------------------------------------------------

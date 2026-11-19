@@ -4,3 +4,6 @@
 WTF/
 SavedVariables/
 .claude/
+tools/.cache/
+tools/*.log
+tools/*.err

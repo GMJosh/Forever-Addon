@@ -1,8 +1,8 @@
 ## Interface: 16001
 ## Title: CraftPath
-## Notes: Profession leveling planner: the cheapest next craft, or a whole path from your skill to the cap, with a shopping list. Uses Auctionator prices when installed. Recipe data from ForeverDB.net.
+## Notes: Profession planner: the cheapest next craft or a whole path to the cap, with a shopping list that says where to buy or gather each item. Uses Auctionator prices. Data from ForeverDB.net.
 ## Author: Josh
-## Version: 0.2.0
+## Version: 0.3.0
 ## Category: Professions
 ## SavedVariables: CraftPathDB
 ## OptionalDeps: Auctionator
@@ -14,5 +14,7 @@ Core.lua
 Scan.lua
 Planner.lua
 Data\Recipes.lua
+Data\Vendors.lua
+Data\Gathering.lua
 Path.lua
 UI\Window.lua

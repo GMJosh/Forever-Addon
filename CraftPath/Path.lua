@@ -142,3 +142,38 @@ function ns.BuildPath(profName, prof, fromSkill, toSkill, includeUnlearned)
 	end)
 	return { steps = steps, shopping = shopping, total = total, unpriced = unpricedItems, from = fromSkill, to = toSkill, gaps = gaps }
 end
+
+local function WaypointLink(m, x, y)
+	if m and m > 0 then
+		return string.format(" |cff71d5ff|Hcraftpath:way:%d:%.1f:%.1f|h[waypoint]|h|r", m, x, y)
+	end
+	return ""
+end
+
+-- Where to learn a recipe you do not know yet: a nearby trainer or the vendor that sells it (ForeverDB data).
+function ns.LearnSource(profName, r)
+	local faction = UnitFactionGroup and UnitFactionGroup("player")
+	local side = faction == "Alliance" and "A" or faction == "Horde" and "H" or "N"
+	local ways = r.w or ""
+	if ways:find("auto", 1, true) then
+		return "learned automatically"
+	end
+	local v = (side == "H" and r.rvh) or (side == "A" and r.rva) or r.rva or r.rvh
+	if ways:find("vendor", 1, true) and v then
+		return string.format("buy the recipe from %s, %s (%.0f, %.0f)%s", v.n, v.z, v.x, v.y, WaypointLink(v.m, v.x, v.y))
+	end
+	local data = ns.RecipeData and ns.RecipeData[profName]
+	if ways:find("trainer", 1, true) and data and data.trainers then
+		local need, best = r.ls or r.o or 1, nil
+		for _, t in ipairs(data.trainers) do
+			if (t.s == side or t.s == "N") and t.u >= need and (not best or t.u < best.u) then
+				best = t
+			end
+		end
+		if best then
+			return string.format("trainer %s, %s (%.0f, %.0f)%s", best.n, best.z, best.x, best.y, WaypointLink(best.m, best.x, best.y))
+		end
+		return "trainer"
+	end
+	return ways ~= "" and ways or "see ForeverDB"
+end

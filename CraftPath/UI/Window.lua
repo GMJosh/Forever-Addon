@@ -212,6 +212,16 @@ local function Build()
 	link:SetScript("OnEscapePressed", link.ClearFocus)
 	frame.creditLink = link
 
+	-- clicks on waypoint links (guarded: not every client lets a plain frame take links)
+	for _, f in ipairs({ frame, content }) do
+		if f.SetHyperlinksEnabled then
+			f:SetHyperlinksEnabled(true)
+			f:SetScript("OnHyperlinkClick", function(_, link)
+				ns.HandleLink(link)
+			end)
+		end
+	end
+
 	frame:Hide()
 end
 
@@ -224,7 +234,7 @@ local function PathText(profName, prof)
 	local lines = { format("|cffffd100%s: skill %d to %d|r", profName, plan.from, plan.to) }
 	for _, st in ipairs(plan.steps) do
 		local r = st.c.r
-		local note = st.c.known and "" or format(" |cffff8080(learn: %s%s)|r", r.w or "?", r.ls and (" at " .. r.ls) or "")
+		local note = st.c.known and "" or format("\n    |cffff8080Learn: %s|r", ns.LearnSource(profName, r))
 		lines[#lines + 1] = format("%d-%d  %s x%d%s", st.from, st.to, r.n, st.crafts, note)
 	end
 	if #plan.gaps > 0 then
@@ -236,6 +246,10 @@ local function PathText(profName, prof)
 		if g.buy > 0 then
 			lines[#lines + 1] = format("Buy %d  %s  (need %d, have %d)  %s", g.buy, ns.ItemName(g.item), g.need, g.have,
 				g.cost and ns.Money(g.cost) or "|cffff8080no price|r")
+			local source = ns.SourceText(g.item)
+			if source ~= "" then
+				lines[#lines + 1] = "    " .. source
+			end
 		end
 	end
 	lines[#lines + 1] = ""
@@ -257,6 +271,9 @@ local function ShoppingText(entry)
 		if r.buy > 0 then
 			lines[#lines + 1] = format("Buy %d  %s  (need %d, have %d)  %s", r.buy, r.name, r.need, r.have,
 				r.cost and ns.Money(r.cost) or "|cffff8080no price|r")
+			if r.source ~= "" then
+				lines[#lines + 1] = "    " .. r.source
+			end
 		else
 			lines[#lines + 1] = format("|cff80ff80Have enough:|r %s (%d)", r.name, r.need)
 		end

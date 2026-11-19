@@ -64,7 +64,9 @@ Ranks the recipes you know by cost per skill-up, or plans a whole path from your
 
 **Full path to the cap:** click **Show full path** (bottom left). CraftPath plans every skill point from where you are up to the cap (or the skill you type into **Plan up to skill**, then press Enter). You get a list like "75-95 Linen Bandage x40", plus one shopping list for the whole path. Tick **Include recipes I have not learned yet** to plan with recipes you still need to learn; those are marked with where to learn them. The recipe colors come from ForeverDB.net data bundled with the addon, so the plan works even for recipes you can't see yet.
 
-**Good to know:** the "next craft" view uses the colors from your last scan, so reopen the profession window after you skill up. Skill-up chances by color are estimates (orange 100%, yellow 75%, green 25%, grey 0%). Vendor reagents usually have no auction price, so set them with `/cpath price` or the totals will be too low. Recipe data is from [ForeverDB.net](https://foreverdb.net).
+**Where to buy or gather:** under each item on a shopping list, CraftPath shows where to get it: the cheapest vendor on your side (name, zone and coordinates), or the best zones to gather it (herbs and ore). Click the blue **[waypoint]** link to put a pin on your map. Vendor prices are used automatically, so most vendor reagents no longer need a price set by hand. If both a vendor and Auctionator know an item, the cheaper one is used. For recipes you haven't learned, the plan also says which trainer or vendor teaches it.
+
+**Good to know:** the "next craft" view uses the colors from your last scan, so reopen the profession window after you skill up. Skill-up chances by color are estimates (orange 100%, yellow 75%, green 25%, grey 0%). Items with no vendor, no auction price and no price of your own count as free, so set those with `/cpath price` or the totals will be too low (reagents that drop or come from other crafts are the usual ones). Recipe data is from [ForeverDB.net](https://foreverdb.net).
 
 ---
 

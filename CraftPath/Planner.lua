@@ -3,8 +3,32 @@ local addonName, ns = ...
 
 local sort = table.sort
 local max = math.max
+local format = string.format
 
--- Copper for one item: your own price first (vendor items), then Auctionator. nil when unknown.
+-- The best vendor for an item on your side (ForeverDB data, Data\Vendors.lua): unlimited stock first, then cheapest.
+local function PlayerSide()
+	local faction = UnitFactionGroup and UnitFactionGroup("player")
+	return faction == "Alliance" and "A" or faction == "Horde" and "H" or "N"
+end
+
+function ns.VendorFor(itemID)
+	local list = ns.VendorData and ns.VendorData[itemID]
+	if not list then
+		return nil
+	end
+	local side, best = PlayerSide(), nil
+	for _, v in ipairs(list) do
+		if v.s == side or v.s == "N" or side == "N" then
+			if not best or (v.l and 1 or 0) < (best.l and 1 or 0) or ((v.l and 1 or 0) == (best.l and 1 or 0) and v.p < best.p) then
+				best = v
+			end
+		end
+	end
+	return best
+end
+
+-- Copper for one item: your own price first, then the cheaper of the auction house (Auctionator) and a vendor.
+-- nil when unknown.
 function ns.Price(itemID)
 	if not itemID then
 		return nil
@@ -13,14 +37,36 @@ function ns.Price(itemID)
 	if own then
 		return own
 	end
+	local ah
 	local A = Auctionator and Auctionator.API and Auctionator.API.v1
 	if A and A.GetAuctionPriceByItemID then
 		local ok, price = pcall(A.GetAuctionPriceByItemID, "CraftPath", itemID)
 		if ok and price and price > 0 then
-			return price
+			ah = price
 		end
 	end
-	return nil
+	local vendor = ns.VendorFor(itemID)
+	local vp = vendor and not vendor.l and vendor.p or nil
+	if ah and vp then
+		return ah < vp and ah or vp
+	end
+	return ah or vp
+end
+
+-- Where to get an item: a short text and (for vendors) a clickable waypoint link. Empty when nothing is known.
+function ns.SourceText(itemID)
+	local v = ns.VendorFor(itemID)
+	local g = ns.GatherData and ns.GatherData[itemID]
+	if v and not v.l then
+		local link = ""
+		if v.m and v.m > 0 then
+			link = format(" |cff71d5ff|Hcraftpath:way:%d:%.1f:%.1f|h[waypoint]|h|r", v.m, v.x, v.y)
+		end
+		return format("|cffb0b0b0Vendor: %s, %s (%.0f, %.0f)%s|r", v.n, v.z, v.x, v.y, link)
+	elseif g then
+		return format("|cffb0b0b0Gather: %s (skill %d) in %s|r", g.k, g.skill, table.concat(g.z, ", "))
+	end
+	return ""
 end
 
 local function Have(itemID)
@@ -107,7 +153,7 @@ function ns.ShoppingList(entry, crafts)
 		if cost then
 			total = total + cost
 		end
-		rows[#rows + 1] = { name = ItemName(g.item), need = need, have = have, buy = buy, cost = cost, item = g.item }
+		rows[#rows + 1] = { name = ItemName(g.item), need = need, have = have, buy = buy, cost = cost, item = g.item, source = ns.SourceText(g.item) }
 	end
 	return rows, total
 end
