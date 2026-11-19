@@ -6,6 +6,7 @@ Addons for the World of Warcraft **Forever** (Classic) client, Interface `16001`
 |---|---|---|
 | **AltTimeBudget** | Weekly chore planner: set your hours, get a plan across your characters. | `/atb` |
 | **ReturnFromBreak** | One window answering "what was I doing?": unspent talents, current quests, what changed. | `/rfb` |
+| **LevelPace** | Leveling tracker: where your time goes (travel, idle, town, fighting), time to level, XP per hour, kills to level, best zones. | `/lp` |
 | **SessionJournal** | Session logbook: runtime, zones, loot, deaths, gold, with recaps. | `/sj` |
 | **StreamBingo** | Detects in-game moments for a Twitch bingo companion app. See `docs/BRIDGE_PROTOCOL.md`. | `/bingo` |
 
