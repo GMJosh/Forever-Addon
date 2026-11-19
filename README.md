@@ -18,6 +18,8 @@ Addons for the World of Warcraft **Forever** (Classic) client, Interface `16001`
 
 Each addon also has a `debug` command that opens a copyable debug window.
 
+**New here?** Read the [User Guide](docs/USER_GUIDE.md) for commands and how to use each addon.
+
 ## Status
 
 Early versions, tested in-game by one person. Please open an issue with the full Lua error if something breaks
