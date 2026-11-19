@@ -36,6 +36,7 @@ Tracks how long you spend on each part of leveling, so you can see where time is
 - **This level:** time buckets, XP per hour (last 10 minutes), estimated time to level, kills to level (from your last 20 kills), XP split between kills, quests and other, XP per hour by zone, and plain-language tips such as "Travel is 40% of your time."
 - **Session:** the same for this login.
 - **History:** your past levels, to compare pace over time.
+- **Advisor:** where to level at your level. It lists the five zones with the most quests left for you (and your own XP per hour there if you've played it), up to eight quests to pick up in the zone you're standing in with who gives them and a clickable **[waypoint]**, and the dungeons and raids that fit your level. Quests you've already done or have in your log are skipped. The data comes from [ForeverDB.net](https://foreverdb.net), and the credit link sits at the bottom of the tab.
 
 **Tips:** let it run for a few minutes before trusting the tips. Time to level and kills to level need some kills to get accurate.
 

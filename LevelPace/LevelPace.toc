@@ -2,7 +2,7 @@
 ## Title: LevelPace
 ## Notes: Where does your leveling time go? Tracks travel, idle, town and fight time, XP per hour, time to level and kills to level.
 ## Author: Josh
-## Version: 0.1.0
+## Version: 0.2.0
 ## Category: Miscellaneous
 ## SavedVariables: LevelPaceDB
 ## IconTexture: Interface\Icons\INV_Misc_PocketWatch_01
@@ -13,5 +13,8 @@ Core.lua
 Tracker.lua
 XP.lua
 Report.lua
+Data\Quests.lua
+Data\Dungeons.lua
+Advisor.lua
 UI\HUD.lua
 UI\ReportWindow.lua

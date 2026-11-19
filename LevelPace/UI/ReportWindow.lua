@@ -72,7 +72,7 @@ local function Build()
 	frame.TitleText:SetText("LevelPace")
 
 	frame.tabs = {}
-	local labels = { { "level", "This level" }, { "session", "Session" }, { "history", "History" } }
+	local labels = { { "level", "This level" }, { "session", "Session" }, { "history", "History" }, { "advisor", "Advisor" } }
 	for i, t in ipairs(labels) do
 		local btn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 		btn:SetSize(100, 22)
@@ -92,8 +92,102 @@ local function Build()
 	frame.text:SetJustifyV("TOP")
 	frame.text:SetSpacing(3)
 
+	-- credit for the quest and dungeon data (ForeverDB asks for a visible link)
+	frame.credit = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+	frame.credit:SetPoint("BOTTOMRIGHT", -14, 14)
+	frame.credit:SetText("Advisor data: ForeverDB.net")
+	local link = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
+	link:SetSize(150, 18)
+	link:SetPoint("RIGHT", frame.credit, "LEFT", -6, 0)
+	link:SetAutoFocus(false)
+	link:SetText("https://foreverdb.net")
+	link:SetCursorPosition(0)
+	link:SetScript("OnTextChanged", function(self, user)
+		if user then
+			self:SetText("https://foreverdb.net")
+		end
+	end)
+	link:SetScript("OnEditFocusGained", function(self)
+		self:HighlightText()
+	end)
+	link:SetScript("OnEscapePressed", link.ClearFocus)
+	frame.creditLink = link
+
+	-- clicks on waypoint links in the Advisor tab (guarded: not every client lets a plain frame take links)
+	if frame.SetHyperlinksEnabled then
+		frame:SetHyperlinksEnabled(true)
+		frame:SetScript("OnHyperlinkClick", function(_, linkText)
+			ns.HandleLink(linkText)
+		end)
+	end
+
 	frame:Hide()
 	tinsert(UISpecialFrames, "LevelPaceReport")
+end
+
+local function WaypointLink(map, x, y)
+	if map and x and y then
+		return format(" |cff71d5ff|Hlevelpace:way:%d:%.1f:%.1f|h[waypoint]|h|r", map, x, y)
+	end
+	return ""
+end
+
+local function AdvisorText()
+	local level = ns.level or UnitLevel("player")
+	local cap = (GetMaxLevelForPlayerExpansion and GetMaxLevelForPlayerExpansion()) or 60
+	if not ns.QuestData then
+		return "No quest data found. Reinstall the addon."
+	end
+	local lines = { Header(format("Where to level at level %d", level)) }
+	if level >= cap then
+		lines[#lines + 1] = "You are at the level cap. Dungeons and raids are the next step."
+	end
+
+	lines[#lines + 1] = ""
+	lines[#lines + 1] = Header("Best zones for quests (most left to do)")
+	local zones = ns.AdvisorZones(level)
+	if #zones == 0 then
+		lines[#lines + 1] = "No quests left in range. Try a dungeon."
+	end
+	for i = 1, math.min(5, #zones) do
+		local z = zones[i]
+		local mine = ns.char.zones and ns.char.zones[z.name]
+		local rate = mine and mine.secs and mine.secs >= ns.ZONE_MIN_SECONDS and mine.xp > 0 and (mine.xp / mine.secs * 3600) or nil
+		lines[#lines + 1] = format("%d. %s: %d quests (levels %d-%d)%s", i, z.name, z.count, z.lo, z.hi,
+			rate and format("  - your pace here: %s XP/hr", ns.Comma(math.floor(rate))) or "")
+	end
+
+	local here = ns.AdvisorCurrentZone()
+	lines[#lines + 1] = ""
+	if here then
+		lines[#lines + 1] = Header("Quests to pick up in " .. ns.QuestData.zones[here])
+		local quests = ns.AdvisorQuests(here, level, 8)
+		if #quests == 0 then
+			lines[#lines + 1] = "None left at your level here. Check the zones above."
+		end
+		for _, q in ipairs(quests) do
+			local from = q.sn and format("  from %s%s", q.sn, WaypointLink(q.sm, q.sx, q.sy)) or ""
+			lines[#lines + 1] = format("[%d] %s%s", q.l, q.n, from)
+		end
+	else
+		lines[#lines + 1] = Header("Quests to pick up here")
+		lines[#lines + 1] = "Walk into a zone and I will list its quests."
+	end
+
+	lines[#lines + 1] = ""
+	lines[#lines + 1] = Header("Dungeons and raids for your level")
+	local dungeons = ns.AdvisorDungeons(level)
+	if #dungeons == 0 then
+		lines[#lines + 1] = "None in range."
+	end
+	for _, d in ipairs(dungeons) do
+		local tag = d.new and "new in Forever" or (d.st == "forever" and "Forever" or "Classic")
+		local bosses = #d.bosses > 0 and format(", %d bosses", #d.bosses) or ""
+		lines[#lines + 1] = format("%s (%d-%d, %d-player %s, %s%s)", d.n, d.lo, d.hi, d.p, d.kind, tag, bosses)
+	end
+	lines[#lines + 1] = ""
+	lines[#lines + 1] = "|cff9d9d9dQuest levels shown in [brackets]. Quests count when their level is within a few levels of yours.|r"
+	return tconcat(lines, "\n")
 end
 
 local function SourceRecord()
@@ -168,17 +262,19 @@ function ns.UpdateReport()
 	if not frame or not frame:IsShown() or not ns.rec then
 		return
 	end
-	local historyMode = mode == "history"
+	local textOnly = mode == "history" or mode == "advisor"
 	for _, row in ipairs(frame.rows) do
-		row.label:SetShown(not historyMode)
-		row.back:SetShown(not historyMode)
-		row.bar:SetShown(not historyMode)
-		row.value:SetShown(not historyMode)
+		row.label:SetShown(not textOnly)
+		row.back:SetShown(not textOnly)
+		row.bar:SetShown(not textOnly)
+		row.value:SetShown(not textOnly)
 	end
-	if historyMode then
+	frame.credit:SetShown(mode == "advisor")
+	frame.creditLink:SetShown(mode == "advisor")
+	if textOnly then
 		frame.text:ClearAllPoints()
 		frame.text:SetPoint("TOPLEFT", 14, -62)
-		frame.text:SetText(HistoryText())
+		frame.text:SetText(mode == "advisor" and AdvisorText() or HistoryText())
 		return
 	end
 	frame.text:ClearAllPoints()
