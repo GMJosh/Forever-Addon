@@ -36,6 +36,9 @@ end
 
 local function ItemName(itemID)
 	local name = C_Item and C_Item.GetItemNameByID and C_Item.GetItemNameByID(itemID)
+	if not name and C_Item and C_Item.RequestLoadItemDataByID then
+		C_Item.RequestLoadItemDataByID(itemID) -- the name arrives later; ITEM_DATA_LOAD_RESULT refreshes the window
+	end
 	return name or ("item:" .. itemID)
 end
 ns.ItemName = ItemName

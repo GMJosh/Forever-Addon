@@ -20,6 +20,8 @@ ns.DIFF_COLORS = {
 ns.DEFAULTS = {
 	countBagsFree = true,   -- items already in your bags cost nothing
 	crafts = 10,            -- crafts used for the shopping list
+	target = nil,           -- skill to plan up to (nil = the cap)
+	includeUnlearned = false, -- plan with recipes you have not learned yet
 	prices = {},            -- [itemID] = copper, set with /cpath price (for vendor items)
 	chars = {},
 	window = { point = "CENTER", relPoint = "CENTER", x = 0, y = 0 },

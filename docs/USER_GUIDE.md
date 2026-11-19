@@ -43,7 +43,7 @@ Tracks how long you spend on each part of leveling, so you can see where time is
 
 ## CraftPath
 
-Ranks the recipes you know by cost per skill-up and builds a shopping list for the best one.
+Ranks the recipes you know by cost per skill-up, or plans a whole path from your skill to the cap, with a shopping list.
 
 **Commands**
 
@@ -62,7 +62,9 @@ Ranks the recipes you know by cost per skill-up and builds a shopping list for t
 
 **Prices** come from Auctionator if you have it. Reagents with no price (a `*` shows next to the cost) are counted as free, so the cost is too low. Set them with `/cpath price`. Auction sales assume a 5% cut.
 
-**Good to know:** recipe colors are as of your last scan, so reopen the profession window after you skill up. Skill-up chances by color are estimates (orange 100%, yellow 75%, green 25%, grey 0%). It suggests the best craft right now; it does not yet plan the whole 1 to 300 path.
+**Full path to the cap:** click **Show full path** (bottom left). CraftPath plans every skill point from where you are up to the cap (or the skill you type into **Plan up to skill**, then press Enter). You get a list like "75-95 Linen Bandage x40", plus one shopping list for the whole path. Tick **Include recipes I have not learned yet** to plan with recipes you still need to learn; those are marked with where to learn them. The recipe colors come from ForeverDB.net data bundled with the addon, so the plan works even for recipes you can't see yet.
+
+**Good to know:** the "next craft" view uses the colors from your last scan, so reopen the profession window after you skill up. Skill-up chances by color are estimates (orange 100%, yellow 75%, green 25%, grey 0%). Vendor reagents usually have no auction price, so set them with `/cpath price` or the totals will be too low. Recipe data is from [ForeverDB.net](https://foreverdb.net).
 
 ---
 

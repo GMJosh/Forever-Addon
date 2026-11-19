@@ -5,10 +5,12 @@ local format = string.format
 local tinsert = table.insert
 local tconcat = table.concat
 local sort = table.sort
+local max = math.max
 
 local frame
 local selected -- index into the current ranking
 local ranking = {}
+local mode = "next" -- "next" = best craft right now, "path" = whole plan to a target skill
 local profName
 local refreshQueued = false
 
@@ -134,7 +136,112 @@ local function Build()
 	frame.list:SetJustifyV("TOP")
 	frame.list:SetSpacing(2)
 
+	-- full path view: target skill box, scrolling text
+	frame.targetLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	frame.targetLabel:SetPoint("TOPLEFT", 300, -106)
+	frame.targetLabel:SetText("Plan up to skill:")
+	local tbox = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
+	tbox:SetSize(40, 20)
+	tbox:SetPoint("LEFT", frame.targetLabel, "RIGHT", 10, 0)
+	tbox:SetAutoFocus(false)
+	tbox:SetNumeric(true)
+	tbox:SetMaxLetters(3)
+	tbox:SetScript("OnEnterPressed", function(self)
+		local n = tonumber(self:GetText())
+		ns.db.target = n and n > 0 and n or nil
+		self:ClearFocus()
+		ns.UpdateWindow()
+	end)
+	tbox:SetScript("OnEscapePressed", tbox.ClearFocus)
+	frame.targetBox = tbox
+
+	local unl = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+	unl:SetSize(24, 24)
+	unl:SetPoint("TOPLEFT", 10, -122)
+	unl.text = unl:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	unl.text:SetPoint("LEFT", unl, "RIGHT", 2, 0)
+	unl.text:SetText("Include recipes I have not learned yet")
+	unl:SetScript("OnClick", function(self)
+		ns.db.includeUnlearned = self:GetChecked() and true or false
+		ns.UpdateWindow()
+	end)
+	frame.unlearned = unl
+
+	local scroll = CreateFrame("ScrollFrame", "CraftPathPathScroll", frame, "UIPanelScrollFrameTemplate")
+	scroll:SetPoint("TOPLEFT", 14, -150)
+	scroll:SetPoint("BOTTOMRIGHT", -32, 40)
+	local content = CreateFrame("Frame", nil, scroll)
+	content:SetSize(430, 10)
+	scroll:SetScrollChild(content)
+	frame.pathText = content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	frame.pathText:SetPoint("TOPLEFT", 0, 0)
+	frame.pathText:SetWidth(430)
+	frame.pathText:SetJustifyH("LEFT")
+	frame.pathText:SetJustifyV("TOP")
+	frame.pathText:SetSpacing(2)
+	frame.pathContent = content
+	frame.scroll = scroll
+
+	-- switch between "next craft" and "full path"
+	frame.modeBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+	frame.modeBtn:SetSize(130, 22)
+	frame.modeBtn:SetPoint("BOTTOMLEFT", 12, 10)
+	frame.modeBtn:SetScript("OnClick", function()
+		mode = (mode == "path") and "next" or "path"
+		ns.UpdateWindow()
+	end)
+
+	-- credit for the recipe data (ForeverDB asks for a visible link)
+	frame.credit = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+	frame.credit:SetPoint("BOTTOMRIGHT", -14, 14)
+	frame.credit:SetText("Recipe data: ForeverDB.net")
+	local link = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
+	link:SetSize(150, 18)
+	link:SetPoint("RIGHT", frame.credit, "LEFT", -6, 0)
+	link:SetAutoFocus(false)
+	link:SetText("https://foreverdb.net")
+	link:SetCursorPosition(0)
+	link:SetScript("OnTextChanged", function(self, user)
+		if user then
+			self:SetText("https://foreverdb.net")
+		end
+	end)
+	link:SetScript("OnEditFocusGained", link.HighlightText)
+	link:SetScript("OnEscapePressed", link.ClearFocus)
+	frame.creditLink = link
+
 	frame:Hide()
+end
+
+local function PathText(profName, prof)
+	local target = ns.db.target
+	local plan, reason = ns.BuildPath(profName, prof, prof.skill or 1, target or prof.max, ns.db.includeUnlearned)
+	if not plan then
+		return reason or "No plan."
+	end
+	local lines = { format("|cffffd100%s: skill %d to %d|r", profName, plan.from, plan.to) }
+	for _, st in ipairs(plan.steps) do
+		local r = st.c.r
+		local note = st.c.known and "" or format(" |cffff8080(learn: %s%s)|r", r.w or "?", r.ls and (" at " .. r.ls) or "")
+		lines[#lines + 1] = format("%d-%d  %s x%d%s", st.from, st.to, r.n, st.crafts, note)
+	end
+	if #plan.gaps > 0 then
+		lines[#lines + 1] = format("|cffff8080No recipe can skill you up at %d point(s), starting at %d.|r", #plan.gaps, plan.gaps[1])
+	end
+	lines[#lines + 1] = ""
+	lines[#lines + 1] = "|cffffd100Shopping list (whole path)|r"
+	for _, g in ipairs(plan.shopping) do
+		if g.buy > 0 then
+			lines[#lines + 1] = format("Buy %d  %s  (need %d, have %d)  %s", g.buy, ns.ItemName(g.item), g.need, g.have,
+				g.cost and ns.Money(g.cost) or "|cffff8080no price|r")
+		end
+	end
+	lines[#lines + 1] = ""
+	lines[#lines + 1] = "Total to buy: " .. ns.Money(plan.total)
+	if plan.unpriced > 0 then
+		lines[#lines + 1] = format("|cffff8080%d reagent(s) have no price, so the total is too low. Set prices with /cpath price [item] 2g.|r", plan.unpriced)
+	end
+	return tconcat(lines, "\n")
 end
 
 local function ShoppingText(entry)
@@ -195,6 +302,28 @@ function ns.UpdateWindow()
 	local ago = time() - (prof.scanned or 0)
 	frame.status:SetText(format("%s: skill %d/%d. Scanned %s ago. Colors are as of that scan; reopen the profession window to refresh.",
 		profName, prof.skill or 0, prof.max or 0, ns.AgoText(ago)))
+	-- which controls belong to which view
+	local pathMode = mode == "path"
+	frame.modeBtn:SetText(pathMode and "Show next craft" or "Show full path")
+	frame.scroll:SetShown(pathMode)
+	frame.targetLabel:SetShown(pathMode)
+	frame.targetBox:SetShown(pathMode)
+	frame.unlearned:SetShown(pathMode)
+	frame.check:SetShown(not pathMode)
+	frame.craftsLabel:SetShown(not pathMode)
+	frame.craftsBox:SetShown(not pathMode)
+	if pathMode then
+		frame.unlearned:SetChecked(ns.db.includeUnlearned)
+		frame.targetBox:SetText(tostring(ns.db.target or prof.max or 0))
+		frame.pathText:SetText(PathText(profName, prof))
+		frame.pathContent:SetHeight(max(10, frame.pathText:GetStringHeight()))
+		frame.list:SetText("")
+		for _, row in ipairs(frame.rows) do
+			row:Hide()
+		end
+		return
+	end
+
 	ranking = ns.Rank(prof)
 	if selected and not ranking[selected] then
 		selected = nil
@@ -243,6 +372,19 @@ function ns.ToggleWindow()
 		ns.UpdateWindow()
 	end
 end
+
+-- Item names load a moment after they are first asked for.
+local namesQueued = false
+ns.On("ITEM_DATA_LOAD_RESULT", function()
+	if namesQueued or not frame or not frame:IsShown() then
+		return
+	end
+	namesQueued = true
+	C_Timer.After(0.5, function()
+		namesQueued = false
+		ns.UpdateWindow()
+	end)
+end)
 
 -- Bag changes change what you still need to buy; refresh once things settle.
 ns.On("BAG_UPDATE_DELAYED", function()
