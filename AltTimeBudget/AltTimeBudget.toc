@@ -1,0 +1,25 @@
+## Interface: 16001
+## Title: AltTimeBudget
+## Notes: Tell it how many hours you have this week. It ranks weekly chores across your alts by reward per minute, builds a plan that fits, and tells you which alts to skip.
+## Author: Josh
+## Version: 0.1.0
+## Category: Miscellaneous
+## SavedVariables: AltTimeBudgetDB
+## IconTexture: Interface\Icons\INV_Misc_PocketWatch_01
+
+embeds.xml
+
+Config.lua
+Data\QuestIDs.lua
+Data\Presets.lua
+Debug.lua
+Core.lua
+
+Modules\Chores.lua
+Modules\Roster.lua
+Modules\TimeLearner.lua
+Modules\Detection.lua
+Modules\Planner.lua
+
+UI\MainWindow.lua
+UI\Options.lua

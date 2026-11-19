@@ -1,0 +1,21 @@
+## Interface: 16001
+## Title: SessionJournal
+## Notes: Automatically writes a diary of each play session. Browse old sessions like a logbook and export recaps for streams or Discord.
+## Author: Josh
+## Version: 0.1.0
+## Category: Miscellaneous
+## SavedVariables: SessionJournalDB
+## IconTexture: Interface\Icons\INV_Misc_Book_09
+
+embeds.xml
+
+Config.lua
+Debug.lua
+Core.lua
+
+Modules\Tracker.lua
+Modules\Recap.lua
+
+UI\LiveTracker.lua
+UI\Logbook.lua
+UI\Options.lua

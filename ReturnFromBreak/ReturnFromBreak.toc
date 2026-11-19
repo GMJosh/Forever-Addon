@@ -1,0 +1,29 @@
+## Interface: 16001
+## Title: ReturnFromBreak
+## Notes: Back from a break? One window that answers "what was I doing?"
+## Author: Josh
+## Version: 0.1.0
+## Category: Miscellaneous
+## SavedVariables: ReturnFromBreakDB, ReturnFromBreakDebugLog
+## IconTexture: Interface\Icons\INV_Misc_PocketWatch_01
+
+# Libraries (Ace3 Release-r1403)
+embeds.xml
+
+# Core
+Config.lua
+Debug.lua
+Core.lua
+
+# Data (user-editable)
+Data\Zones.lua
+
+# Section modules
+Modules\Talents.lua
+Modules\Quests.lua
+Modules\Snapshot.lua
+Modules\Zones.lua
+
+# UI and options
+UI\MainWindow.lua
+Options.lua

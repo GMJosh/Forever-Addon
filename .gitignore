@@ -1,0 +1,6 @@
+# SavedVariables, logs, scratch
+*.lua.bak
+*.log
+WTF/
+SavedVariables/
+.claude/
